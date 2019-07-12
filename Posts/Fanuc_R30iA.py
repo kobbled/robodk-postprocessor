@@ -550,6 +550,20 @@ class RobotPost(object):
             self.addline('WAIT %s=%s TIMEOUT, LBL[%i] ;' % (io_var, io_value, self.LBL_ID_COUNT))
             self.addline('MESSAGE[Timed out for LBL[%i]] ;' % self.LBL_ID_COUNT)
             self.addline('PAUSE ;')
+            self.setLBL()
+
+    def waitMS(self, timeout_ms):
+        self.addline('WAIT   %.2f(sec) ;' % ((timeout_ms * 1.0) / 1000.0))
+
+    def startTimer(self, timer_var):
+        self.addline('TIMER[%i]=START ;' % (timer_var))
+
+    def stopTimer(self, timer_var):
+        self.addline('TIMER[%i]=STOP ;' % (timer_var))
+
+    def resetTimer(self, timer_var):
+        self.addline('TIMER[%i]=RESET ;' % (timer_var))
+
     def addlastline(self, add_params):
         """Add parameters to the last command"""
         if len(self.PROG) > 0 and self.PROG[-1].endswith(';\n'):
