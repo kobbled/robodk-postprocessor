@@ -369,12 +369,23 @@ class RobotPost(object):
                 
         if pose is None:
             target_id = self.add_target_joints(pose, joints)
-            move_ins = 'P[%i] %s %s ;' % (target_id, self.SPEED, self.CNT_VALUE)
         else:
             target_id = self.add_target_cartesian(pose, joints, conf_RLF)
-            move_ins = 'P[%i] %s %s ;' % (target_id, self.SPEED, self.CNT_VALUE)
-            
-        self.addline(move_ins, 'L')
+
+        # if tool is on use speed register
+        if hasattr(self, 'REG_SPEED'):
+            speed = self.REG_SPEED
+        else:
+            speed = self.SPEED
+
+        # Add time after instruction to call a program after position has been reached.
+        move_ins = 'P[%i] %s %s' % (target_id, speed, self.CNT_VALUE)
+        if hasattr(self, 'TIMEAFTER'):
+            move_ins = '%s %s' % (move_ins, self.TIMEAFTER)
+        if hasattr(self, 'P_OFFSET'):
+            move_ins = '%s %s' % (move_ins, self.P_OFFSET)
+
+        self.addline('%s ;' % (move_ins), 'L')
         self.LAST_POSE = pose
         
     def MoveC(self, pose1, joints1, pose2, joints2, conf_RLF_1=None, conf_RLF_2=None):
