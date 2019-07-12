@@ -583,40 +583,40 @@ class RobotPost(object):
     def RunCode(self, code, is_function_call = False):
         """Adds code or a function call"""
         if is_function_call:
-            code = get_safe_name(code, 12)
-            if code.startswith("ArcStart"):
-                if not code.endswith(')'):
-                    code = code + '()'
-                
-                self.ARC_PARAMS = code[9:-1]
-                if len(self.ARC_PARAMS) < 1:
-                    # Use default sine wave parameters
-                    self.ARC_PARAMS = '2.0Hz,8.0mm,0.075s,0.075'
-                
-                # use desired weld speed:
-                self.SPEED_BACKUP = self.SPEED
-                self.SPEED = 'WELD_SPEED'
-                
-                # Provoke ARC START:
-                self.addlastline('Arc Start[11]')
-                
-                # Tune weave with parameters
-                self.addline('Weave Sine[%s] ;' % self.ARC_PARAMS)
-                return # Do not generate default program call
-            elif code.startswith("ArcEnd"):
-                # Provoke ARC END:
-                self.addlastline('Arc End[11]')
-                
-                # Revert to desired speed
-                self.SPEED = self.SPEED_BACKUP
-                self.SPEED_BACKUP = None
-                
-                self.ARC_PARAMS = None
-                return # Do not generate default program call
-            
-            # default program call
-            code.replace(' ','_')
-            self.addline('CALL %s ;' % (code))
+            code.replace(' ', '_')
+            if code.startswith('P_OFFSET'):
+                # Customized P_OFFSET:
+                value = code[len('P_OFFSET'):]
+                if len(value) > 2:
+                    exec('self.P_OFFSET=' + value)
+                elif hasattr(self,'P_OFFSET'):
+                    del self.P_OFFSET
+            elif code.startswith('TIMEAFTER'):
+                # Customized TIMEAFTER:
+                value = code[len('TIMEAFTER'):]
+                if len(value) > 2:
+                    exec('self.TIMEAFTER=' + value)
+                elif hasattr(self,'TIMEAFTER'):
+                    # Any other program call
+                    del self.TIMEAFTER
+            elif code.startswith('REG_SPEED'):
+                # Customized REG_SPEED:
+                value = code[len('REG_SPEED'):]
+                if len(value) > 2:
+                    exec('self.REG_SPEED=' + value)
+                elif hasattr(self, 'REG_SPEED'):
+                    # Any other program call
+                    del self.REG_SPEED
+            elif code.startswith('CNT_VALUE'):
+                value = code[len('CNT_VALUE'):]
+                if len(value) > 2:
+                    exec('self.CNT_VALUE=' + value)
+            elif code.startswith('resetTimer'):
+                value = code[len('resetTimer'):]
+                if len(value) > 2:
+                    exec('self.resetTimer' + value)
+            else:
+                self.addline('CALL %s ;' % (code))
         else:
             if not code.endswith(';'):
                 code = code + ';'
