@@ -41,7 +41,7 @@
 # ----------------------------------------------------
 
 
-def get_safe_name(progname, max_chars = 10):
+def get_safe_name(progname, max_chars = 20):
     """Get a safe program name"""
     # Remove special characters
     for c in r'-[]/\;,><&*:%=+@!#^()|?^':
@@ -60,6 +60,8 @@ def get_safe_name(progname, max_chars = 10):
 
 # ----------------------------------------------------
 # Import RoboDK tools
+import numbers
+import math
 from robodk import *
 import sys
 
@@ -72,10 +74,13 @@ class RobotPost(object):
     INCLUDE_SUB_PROGRAMS = True # Generate sub programs
     JOINT_SPEED = '20%'     # set default joint speed motion
     SPEED = '500mm/sec'     # set default cartesian speed motion  
+    SPEED_REGISTER = 5
     CNT_VALUE = 'FINE'      # set default CNT value (all motion until smooth value is changed)
     ACTIVE_UF = 9           # Active UFrame Id (register)
     ACTIVE_UT = 9           # Active UTool Id (register)
     SPARE_PR = 9            # Spare Position register for calculations
+    UTOOL_PR = 9
+    UFRAME_PR = 9
 
     # PROG specific variables:
     LINE_COUNT = 0 # Count the number of instructions (limited by MAX_LINES_X_PROG)
@@ -87,7 +92,8 @@ class RobotPost(object):
     ROBOT_POST = ''
     ROBOT_NAME = ''
     PROG_FILES = [] # List of Program files to be uploaded through FTP
-    
+    LblDict = {} # dict to store used labels
+
     PROG_NAMES = [] # List of PROG NAMES
     PROG_LIST = [] # List of PROG 
     
@@ -443,7 +449,65 @@ class RobotPost(object):
             self.CNT_VALUE = 'FINE'
         else:
             self.CNT_VALUE = 'CNT%i' % round(min(zone_mm, 100.0))        
-        
+
+    def setTimeAfter(self, ta_ms, var=None):
+        if isinstance(var, numbers.Number):
+            value = 'TA   %.2fsec,DO[%i]=ON' % (ta_ms * 0.001, var)
+        elif isinstance(var, str):
+            value = 'TA   %.2fsec,CALL %s' % (ta_ms * 0.001, var)
+        else:
+            value = None
+            self.addlog('Digital register, or CALL is not set for time after event.')
+
+        return value
+
+    def setLBL(self, counterName='LBL_ID_COUNT', labelName=None):
+        # get counter
+        counter = getattr(self, counterName)
+        if counter < 1:
+            counter = 1
+
+        # add label to dict
+        if counter not in self.LblDict:
+            if labelName is not None:
+                self.LblDict[counter] = labelName
+            else:
+                self.LblDict[counter] = ''
+        else:
+            self.addlog('Label %i, defined multiple times. Label not added.' % (counter))
+            return
+
+        label = 'LBL[%i' % (counter)
+        if labelName is not None:
+            label = '%s:%s' % (label, labelName)
+        label = '%s] ;' % (label)
+
+        self.addline(label)  # add to post
+
+        # set counter
+        counter += 1
+        setattr(self, counterName, counter)
+    
+    def jumpLBL(self, labelNumber=None, numReg=None):
+        jmpLbl = None
+        if numReg is not None:
+            jmpLbl = 'JMP LBL[R[%i]]' % (numReg)
+        else:
+            # val = self.LblDict.get(labelNumber, None)
+            jmpLbl = 'JMP LBL[%i]' % (labelNumber)
+
+        return jmpLbl
+
+    def jump2LBL(self, labelNumber=None, numReg=None):
+        lbl = self.jumpLBL(labelNumber, numReg)
+        if lbl is not None:
+            self.addline('%s ;' % (lbl))
+
+    def ifOnJump(self, conditional, labelNumber=None, numReg=None):
+        lbl = self.jumpLBL(labelNumber, numReg)
+        if lbl is not None:
+            self.addline('IF %s,%s ;' % (conditional, lbl))
+
     def setDO(self, io_var, io_value):
         """Sets a variable (output) to a given value"""
         if type(io_var) != str:  # set default variable name if io_var is a number
