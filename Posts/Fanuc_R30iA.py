@@ -391,11 +391,11 @@ class RobotPost(object):
         """Change the robot reference frame"""
         xyzwpr = Pose_2_Fanuc(pose)
         if frame_id is None or frame_id < 0:            
-            for i in range(6):
-                self.addline('PR[%i,%i]=%.3f ;' % (self.SPARE_PR, i+1, xyzwpr[i]))
-            for i in range(6,self.nAxes):
-                self.addline('PR[%i,%i]=%.3f ;' % (self.SPARE_PR, i+1, 0))
-            self.addline('UFRAME[%i]=PR[%i] ;' % (self.ACTIVE_UF, self.SPARE_PR))
+            # for i in range(6):
+            #     self.addline('PR[%i,%i]=%.3f ;' % (self.UFRAME_PR, i+1, xyzwpr[i]))
+            # for i in range(6,self.nAxes):
+            #     self.addline('PR[%i,%i]=%.3f ;' % (self.UFRAME_PR, i+1, 0))
+            # self.addline('UFRAME[%i]=PR[%i] ;' % (self.ACTIVE_UF, self.UFRAME_PR))
             self.addline('UFRAME_NUM=%i ;' % (self.ACTIVE_UF))
         else:
             self.ACTIVE_UF = frame_id
@@ -406,11 +406,11 @@ class RobotPost(object):
         """Change the robot TCP"""
         xyzwpr = Pose_2_Fanuc(pose)
         if tool_id is None or tool_id < 0:
-            for i in range(6):
-                self.addline('PR[%i,%i]=%.3f ;' % (self.SPARE_PR, i+1, xyzwpr[i]))
-            for i in range(6,self.nAxes):
-                self.addline('PR[%i,%i]=%.3f ;' % (self.SPARE_PR, i+1, 0))
-            self.addline('UTOOL[%i]=PR[%i] ;' % (self.ACTIVE_UT, self.SPARE_PR))
+            # for i in range(6):
+            #     self.addline('PR[%i,%i]=%.3f ;' % (self.UTOOL_PR, i+1, xyzwpr[i]))
+            # for i in range(6,self.nAxes):
+            #     self.addline('PR[%i,%i]=%.3f ;' % (self.UTOOL_PR, i+1, 0))
+            # self.addline('UTOOL[%i]=PR[%i] ;' % (self.ACTIVE_UT, self.UTOOL_PR))
             self.addline('UTOOL_NUM=%i ;' % (self.ACTIVE_UT))
         else:
             self.ACTIVE_UT = tool_id
