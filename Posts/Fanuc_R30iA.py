@@ -634,7 +634,30 @@ class RobotPost(object):
             for i in range(0,len(message), 20):
                 i2 = min(i + 20, len(message))
                 self.addline('MESSAGE[%s] ;' % message[i:i2])
-        
+
+# ------------------ special methods ----------------------
+    def __delattr__(self, name):
+        del self.__dict__[name]
+
+    def __setattr__(self, name, value):
+        if name == "REG_SPEED":
+            if value is None:
+                value = self.SPEED_REGISTER
+            super().__setattr__(name, 'R[%i]mm/sec' % value)
+        elif name == "TIMEAFTER":
+            if len(value) > 1:
+                string = self.setTimeAfter(value[0], value[1])
+            else:
+                string = self.setTimeAfter(value, None)
+            super().__setattr__(name, string)
+        elif name == "P_OFFSET":
+            if value is None:
+                value = self.SPARE_PR
+            super().__setattr__(name, 'Offset,PR[%i]' % value)
+        else:
+            # if py2 : super(MyTest, self).__setattr__(name, value)
+            super().__setattr__(name, value)
+
 # ------------------ private ----------------------
     def page_size_control(self):
         if self.LINE_COUNT >= self.MAX_LINES_X_PROG:
