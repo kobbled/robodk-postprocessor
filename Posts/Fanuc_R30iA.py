@@ -114,7 +114,9 @@ class RobotPost(object):
     AXES_TRACK = []
     AXES_TURNTABLE = []
     HAS_TRACK = False
+    GRP_TRACK = 0
     HAS_TURNTABLE = False
+    GRP_TURNTABLE = 0
     
     # Specific to ARC welding applications
     SPEED_BACKUP = None
@@ -139,7 +141,7 @@ class RobotPost(object):
                 self.HAS_TRACK = True
             elif self.AXES_TYPE[i] == 'J':
                 self.AXES_TURNTABLE.append(i)
-                self.HAS_TURNTABLE = True        
+                self.HAS_TURNTABLE = True
                 
     def ProgStart(self, progname, new_page = False):
         progname = get_safe_name(progname)
@@ -197,7 +199,14 @@ class RobotPost(object):
         header = header + '      ABORT_REQUEST\t= 0,' + '\n'
         header = header + '      PAUSE_REQUEST\t= 0;' + '\n'
         #header = header + 'DEFAULT_GROUP\t= 1,*,*,*,*;' + '\n'  #old controllers
-        header = header + 'DEFAULT_GROUP\t= 1,*,*,*,*,*,*;' + '\n'
+        group_list = ['1','*','*','*','*','*','*']
+        if self.GRP_TRACK != 0:
+            group_list = ['1' if idx == (self.GRP_TRACK-1) else group for idx, group in enumerate(group_list)]
+        if self.GRP_TURNTABLE != 0:
+            group_list = ['1' if idx == (self.GRP_TURNTABLE-1) else group for idx, group in enumerate(group_list)]
+        group_string = ",".join(group_list)
+
+        header = header + "DEFAULT_GROUP\t= {};".format(group_string) + '\n'
         header = header + 'CONTROL_CODE\t= 00000000 00000000;' + '\n'
         if self.HAS_TURNTABLE:
             header = header + '/APPL' + '\n'
@@ -609,7 +618,6 @@ class RobotPost(object):
             self.ProgFinish(self.PROG_NAME, True)
             self.ProgStart(self.PROG_NAME, True)
 
-
     def addline(self, newline, movetype = ' '):
         """Add a program line"""
         if self.nProgs > 1 and not self.INCLUDE_SUB_PROGRAMS:
@@ -637,7 +645,7 @@ class RobotPost(object):
             return
         self.P_COUNT = self.P_COUNT + 1
         add_comma = ""
-        if self.HAS_TRACK:
+        if self.HAS_TRACK and self.GRP_TRACK == 0:
             add_comma = ","
         self.addline_targets('P[%i]{' % self.P_COUNT)
         self.addline_targets('   GP1:')
@@ -647,13 +655,19 @@ class RobotPost(object):
         if self.HAS_TRACK:
             # adding external axes (linear track):
             track_str = ''
-            for i in range(len(self.AXES_TRACK)):
-                track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
+            if self.GRP_TRACK > 0:
+                self.addline_targets('   GP%i:' % (self.GRP_TRACK))
+                self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
+                for i in range(len(self.AXES_TURNTABLE)):
+                    track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TURNTABLE[i]])
+            else:
+                for i in range(len(self.AXES_TRACK)):
+                    track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
             track_str = track_str[:-1]
             self.addline_targets(track_str)
         if self.HAS_TURNTABLE:
             # adding rotative axes (turntable):
-            self.addline_targets('   GP2:')
+            self.addline_targets('   GP%i:' % (self.GRP_TURNTABLE))
             self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
             turntable_str = ''
             for i in range(len(self.AXES_TURNTABLE)):
@@ -689,7 +703,7 @@ class RobotPost(object):
             
         self.P_COUNT = self.P_COUNT + 1
         add_comma = ""
-        if self.HAS_TRACK:
+        if self.HAS_TRACK and self.GRP_TRACK == 0:
             add_comma = ","
         self.addline_targets('P[%i]{' % self.P_COUNT)
         self.addline_targets('   GP1:')
@@ -699,13 +713,19 @@ class RobotPost(object):
         if self.HAS_TRACK:
             # adding external axes (linear track):
             track_str = ''
-            for i in range(len(self.AXES_TRACK)):
-                track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
+            if self.GRP_TRACK > 0:
+                self.addline_targets('   GP%i:' % (self.GRP_TRACK))
+                self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
+                for i in range(len(self.AXES_TURNTABLE)):
+                    track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TURNTABLE[i]])
+            else:
+                for i in range(len(self.AXES_TRACK)):
+                    track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
             track_str = track_str[:-1]
             self.addline_targets(track_str)
         if self.HAS_TURNTABLE:
             # adding rotative axes (turntable):
-            self.addline_targets('   GP2:')
+            self.addline_targets('   GP%i:' % (self.GRP_TURNTABLE))
             self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
             turntable_str = ''
             for i in range(len(self.AXES_TURNTABLE)):
