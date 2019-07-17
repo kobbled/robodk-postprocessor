@@ -380,10 +380,14 @@ class RobotPost(object):
 
         # Add time after instruction to call a program after position has been reached.
         move_ins = 'P[%i] %s %s' % (target_id, speed, self.CNT_VALUE)
+        if hasattr(self, 'COORD'):
+            move_ins = '%s COORD' % (move_ins)
         if hasattr(self, 'TIMEAFTER'):
             move_ins = '%s %s' % (move_ins, self.TIMEAFTER)
         if hasattr(self, 'P_OFFSET'):
             move_ins = '%s %s' % (move_ins, self.P_OFFSET)
+        if hasattr(self, 'TOOL_OFFSET'):
+            move_ins = '%s %s' % (move_ins, self.TOOL_OFFSET)
 
         self.addline('%s ;' % (move_ins), 'L')
         self.LAST_POSE = pose
@@ -592,6 +596,13 @@ class RobotPost(object):
                     exec('self.P_OFFSET=' + value)
                 elif hasattr(self,'P_OFFSET'):
                     del self.P_OFFSET
+            elif code.startswith('TOOL_OFFSET'):
+                # Customized P_OFFSET:
+                value = code[len('TOOL_OFFSET'):]
+                if len(value) > 2:
+                    exec('self.TOOL_OFFSET=' + value)
+                elif hasattr(self,'TOOL_OFFSET'):
+                    del self.TOOL_OFFSET
             elif code.startswith('TIMEAFTER'):
                 # Customized TIMEAFTER:
                 value = code[len('TIMEAFTER'):]
@@ -655,6 +666,10 @@ class RobotPost(object):
             if value is None:
                 value = self.SPARE_PR
             super().__setattr__(name, 'Offset,PR[%i]' % value)
+        elif name == "TOOL_OFFSET":
+            if value is None:
+                value = self.SPARE_PR
+            super().__setattr__(name, 'Tool_Offset,PR[%i]' % value)
         else:
             # if py2 : super(MyTest, self).__setattr__(name, value)
             super().__setattr__(name, value)
@@ -874,6 +889,8 @@ def test_post():
     robot.setZoneData(100)
     # turn on using speed register
     robot.REG_SPEED = robot.SPEED_REGISTER
+    # use coordinated motion
+    robot.COORD = True
     # time after event
     robot.TIMEAFTER = (0, "G0_LASER_START")
 
@@ -884,6 +901,7 @@ def test_post():
     robot.MoveL(Pose([250, 300, 278.023897, 180, 0, -150]), [-37.52588, -6.32628, -
                                                              34.59693, 53.52525, 49.24426, -251.44677])
     robot.P_OFFSET = 50
+    robot.TOOL_OFFSET = 24
     robot.MoveL(Pose([250, 300, 278.023897, 180, 0, -150]), [-37.52588, -6.32628, -34.59693,
                                                              53.52525, 49.24426, -251.44677])
 
@@ -892,6 +910,10 @@ def test_post():
     del robot.P_OFFSET
     robot.MoveL(Pose([250, 250, 191.421356, 180, 0, -150]), [-39.75778, -1.04537, -
                                                              40.37883, 52.09118, 54.15317, -246.94403])
+    # delete coordinated motion
+    del robot.COORD
+    # remove tool offset
+    del robot.TOOL_OFFSET
     # CNT FINE
     robot.setZoneData(-1)
     del robot.REG_SPEED

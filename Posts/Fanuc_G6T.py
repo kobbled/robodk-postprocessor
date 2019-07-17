@@ -27,6 +27,7 @@ class RobotPost(MainClass):
     OFFSET_STOP = 26
     OFFSET_APPROACH = 78
     OFFSET_DEPART = 76
+    USE_COORD_MOTION = False  # flag coordinated motion
 
     # cell configuration
     ACTIVE_UF = 5           # Active UFrame Id (register)
@@ -78,6 +79,11 @@ class RobotPost(MainClass):
         code = self.PROG_START_TOOL
         self.setZoneData(100)
         self.TOOLON = True
+        if self.USE_COORD_MOTION:
+            self.COORD = True
+        else:
+            if hasattr(self, 'COORD'):
+                del self.COORD
         self.P_OFFSET = self.OFFSET_START
         self.REG_SPEED = self.SPEED_REGISTER
         self.TIMEAFTER = (0, code)
@@ -105,6 +111,9 @@ class RobotPost(MainClass):
     def moveLink(self):
         self.stopTimer(self.LASER_TIMER)
         self.setZoneData(100)
+        if self.USE_COORD_MOTION:
+            if hasattr(self, 'COORD'):
+                del self.COORD
         if hasattr(self, 'P_OFFSET'):
             del self.P_OFFSET
         self.setSpeed(self.TRAVEL_SPEED)
@@ -124,6 +133,13 @@ class RobotPost(MainClass):
                     exec('self.P_OFFSET=' + value)
                 elif hasattr(self,'P_OFFSET'):
                     del self.P_OFFSET
+            elif code.startswith('TOOL_OFFSET'):
+                # Customized P_OFFSET:
+                value = code[len('TOOL_OFFSET'):]
+                if len(value) > 2:
+                    exec('self.TOOL_OFFSET=' + value)
+                elif hasattr(self,'TOOL_OFFSET'):
+                    del self.TOOL_OFFSET
             elif code.startswith('TIMEAFTER'):
                 # Customized TIMEAFTER:
                 value = code[len('TIMEAFTER'):]

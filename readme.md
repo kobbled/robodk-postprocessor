@@ -43,6 +43,7 @@ Some attributes make use of the `__setattr__` method to properly format their ou
 * **robot.REG_SPEED**
 * **robot.TIMEAFTER**
 * **robot.P_OFFSET**
+* **robot.TOOL_OFFSET**
 
 ## Attributes
 
@@ -63,6 +64,8 @@ Two motion modifiers are defined which are declared as attributes:
 ```python
 robot.TIMEAFTER = (time, event)
 robot.P_OFFSET = pr_idx
+robot.TOOL_OFFSET = pr_idx
+robot.COORD = True
 ```
 
 **robot.TIMEAFTER** will trigger a time after call, e.g.:
@@ -79,7 +82,20 @@ robot.TIMEAFTER = (0, "PROG1")
 :L P[1] 15mm/sec CNT100 TA   0.00sec,CALL PROG1 ;
 ```
 
-**robot.P_OFFSET** will add an offset position register to tthe motion, where *pr_idx* is the position register index of the position register of which to apply the offsets.
+**robot.P_OFFSET** will add an offset position register to the motion, where *pr_idx* is the position register index of the position register of which to apply the offsets.
+
+**robot.TOOL_OFFSET** is the same as **robot.P_OFFSET** but will incorperate offsets from the position register into the toolframe not the userframe.
+
+**robot.COORD** is used for enabling coordinated motion.
+
+In order to stop using these motion modifiers delete the class attribute, e.g.:
+
+```python
+# delete coordinated motion
+del robot.COORD
+# remove tool offset
+del robot.TOOL_OFFSET
+```
 
 ### Speed
 
