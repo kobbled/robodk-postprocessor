@@ -436,13 +436,14 @@ class RobotPost(object):
             self.addline('WAIT  %.2f(sec) ;' % (time_ms*0.001))
         
     def setSpeed(self, speed_mms):
+        if hasattr(self, 'REG_SPEED'):
+            del self.REG_SPEED
         """Changes the robot speed (in mm/s)"""
         if self.SPEED_BACKUP is None:
             # Set the normal speed
             self.SPEED = '%.0fmm/sec' % max(speed_mms, 0.01)
             # assume 5000 mm/s as 100%
-            self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
-
+            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
         else:
             # Do not alter the speed as we are in ARC movement mode
             # skip speed settings if it has been overriden
@@ -705,8 +706,8 @@ class RobotPost(object):
             if self.GRP_TRACK > 0:
                 self.addline_targets('   GP%i:' % (self.GRP_TRACK))
                 self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
-                for i in range(len(self.AXES_TURNTABLE)):
-                    track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TURNTABLE[i]])
+                for i in range(len(self.AXES_TRACK)):
+                    track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TRACK[i]])
             else:
                 for i in range(len(self.AXES_TRACK)):
                     track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
@@ -718,7 +719,8 @@ class RobotPost(object):
             self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
             turntable_str = ''
             for i in range(len(self.AXES_TURNTABLE)):
-                turntable_str = turntable_str + '\tJ%i=%10.3f deg,' % (i+1, joints[self.AXES_TURNTABLE[i]])
+                angle = (joints[self.AXES_TURNTABLE[i]] % 360) if joints[self.AXES_TURNTABLE[i]] > 360 else joints[self.AXES_TURNTABLE[i]]
+                turntable_str = turntable_str + '\tJ%i=%10.3f deg,' % (i+1, angle)
             turntable_str = turntable_str[:-1]
             self.addline_targets(turntable_str)
         self.addline_targets('};')
@@ -763,8 +765,8 @@ class RobotPost(object):
             if self.GRP_TRACK > 0:
                 self.addline_targets('   GP%i:' % (self.GRP_TRACK))
                 self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
-                for i in range(len(self.AXES_TURNTABLE)):
-                    track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TURNTABLE[i]])
+                for i in range(len(self.AXES_TRACK)):
+                    track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TRACK[i]])
             else:
                 for i in range(len(self.AXES_TRACK)):
                     track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
@@ -776,7 +778,8 @@ class RobotPost(object):
             self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
             turntable_str = ''
             for i in range(len(self.AXES_TURNTABLE)):
-                turntable_str = turntable_str + '\tJ%i=%10.3f deg,' % (i+1, joints[self.AXES_TURNTABLE[i]])
+                angle = (joints[self.AXES_TURNTABLE[i]] % 360) if joints[self.AXES_TURNTABLE[i]] > 360 else joints[self.AXES_TURNTABLE[i]]
+                turntable_str = turntable_str + '\tJ%i=%10.3f deg,' % (i+1, angle)
             turntable_str = turntable_str[:-1]
             self.addline_targets(turntable_str)
         self.addline_targets('};')
