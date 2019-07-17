@@ -48,20 +48,29 @@ class RobotPost(MainClass):
     PASS_LBL_COUNT = 100
 
     TOOLON = False
-    PROG_START_TOOL = 'RUN_LASER_START'
-    PROG_STOP_TOOL = 'RUN_LASER_STOP'
+    PROG_START_CELL = 'G0_LASER_ENABLE'
+    PROG_STOP_CELL = 'G0_LASER_DISABLE'
     PROG_START_EXTRUD = 'G0_POWDER_START'
     PROG_STOP_EXTRUD = 'G0_POWDER_STOP'
-
-
-    def resetLaserTimer(self):
-        self.resetTimer(self.LASER_TIMER)
+    PROG_START_TOOL = 'RUN_LASER_START'
+    PROG_STOP_TOOL = 'RUN_LASER_STOP'
         
     def startExtrud(self):
         self.RunCode(self.PROG_START_EXTRUD, True)
     
     def stopExtrud(self):
         self.RunCode(self.PROG_STOP_EXTRUD, True)
+
+    def startPassLoop(self):
+        self.RunCode(self.PROG_START_CELL, True)
+        self.resetTimer(self.LASER_TIMER)
+        self.RunCode(self.PROG_START_EXTRUD, True)
+        self.RunCode('R[215:passLbl] = 100 + R[180:j]')
+        self.ifOnJump('R[180:j]>=0', numReg=215)
+
+    def stopPassLoop(self):
+        self.RunCode(self.PROG_STOP_EXTRUD, True)
+        self.RunCode(self.PROG_STOP_CELL, True)
 
     def toolOn(self):
         self.waitMS(200)
@@ -83,7 +92,7 @@ class RobotPost(MainClass):
         self.setLBL('PASS_LBL_COUNT', 'pass%i' % (self.PASS_COUNT))
         self.setZoneData(-1)
         self.P_OFFSET = self.OFFSET_APPROACH
-        self.REG_SPEED = self.APPRCH_SPEED
+        self.setSpeed(self.APPRCH_SPEED)
         if hasattr(self, 'TIMEAFTER'):
             del self.TIMEAFTER
 
@@ -98,16 +107,11 @@ class RobotPost(MainClass):
         self.setZoneData(100)
         if hasattr(self, 'P_OFFSET'):
             del self.P_OFFSET
-        if hasattr(self, 'REG_SPEED'):
-            del self.REG_SPEED
+        self.setSpeed(self.TRAVEL_SPEED)
 
     def moveLaserOn(self):
         self.P_OFFSET = self.OFFSET_PR
         self.TIMEAFTER = (0, self.HEIGHT_SENSOR)
-
-    def startPassLoop(self):
-        self.RunCode('R[215:passLbl] = 100 + R[180:j]')
-        self.ifOnJump('R[180:j]>=0', numReg=215)
     
     def RunCode(self, code, is_function_call = False):
         """Adds code or a function call"""
@@ -145,8 +149,6 @@ class RobotPost(MainClass):
                 if len(value) > 2:
                     exec('self.resetTimer' + value)
             # G6T specific calls
-            elif code.startswith('startPassLoop'):
-                exec('self.startPassLoop()')
             elif code.startswith('toolOn'):
                 exec('self.toolOn()')
             elif code.startswith('toolOff'):
@@ -165,8 +167,10 @@ class RobotPost(MainClass):
                 exec('self.startExtrud()')
             elif code.startswith('stopExtrud'):
                 exec('self.stopExtrud()')
-            elif code.startswith('resetLaserTimer'):
-                exec('self.resetLaserTimer()')
+            elif code.startswith('startPassLoop'):
+                exec('self.startPassLoop()')
+            elif code.startswith('stopPassLoop'):
+                exec('self.stopPassLoop()')
             else:
                 self.addline('CALL %s ;' % (code))
         else:
