@@ -1,5 +1,5 @@
 # ----------------------------------------------------
-# Group six custom post
+# Base welding/cladding post processor
 # ----------------------------------------------------
 
 # Import RoboDK tools

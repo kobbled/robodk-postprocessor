@@ -1,5 +1,5 @@
 # ----------------------------------------------------
-# Group six custom post
+# Workcell specific post processor
 # ----------------------------------------------------
 
 # Import RoboDK tools

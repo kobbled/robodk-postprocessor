@@ -1,4 +1,4 @@
-# robodk post processor for Fanuc laser welding robots
+# robodk post processor for Fanuc welding robots
 
 ## is configured for running on a Fanuc R30iB robot controller
 
@@ -12,7 +12,7 @@ This repository contains Fanuc post processor files for use with robodk in inter
 |-> Tests  # Contains test code for robodk modules
 ```
 
-***/Posts*** will contain the relavent post processors. *Fanuc_R30iA.py* is the base post processor for all Fanuc R30iB robot controllers. *Fanuc_G6T.py* inherits all the functionality from *Fanuc_R30iA.py*, and makes use of higher level functionality for laser welding/cladding operations. All other post processors will depend on *Fanuc_G6T.py* and be workcell specific.
+***/Posts*** will contain the relavent post processors. *Fanuc_R30iA.py* is the base post processor for all Fanuc R30iB robot controllers. *Fanuc_G6T.py* inherits all the functionality from *Fanuc_R30iA.py*, and makes use of higher level functionality for welding/cladding operations. All other post processors will depend on *Fanuc_G6T.py* and be workcell specific.
 
 ***/Python*** includes a copy of the Robodk API that is used for these posts. Future versions of the API may conflict with the usage of these post processors.
 
