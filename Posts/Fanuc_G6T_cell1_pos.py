@@ -27,6 +27,7 @@ class RobotPost(G6TClass):
     OFFSET_STOP = 26
     OFFSET_APPROACH = 58
     OFFSET_DEPART = 59
+    USE_COORD_MOTION = False  # flag coordinated motion
 
     # cell configuration
     ACTIVE_UF = 4           # Active UFrame Id (register)
@@ -48,7 +49,9 @@ class RobotPost(G6TClass):
     PASS_LBL_COUNT = 100
 
     TOOLON = False
-    PROG_START_TOOL = 'RUN_LASER_START'
-    PROG_STOP_TOOL = 'RUN_LASER_STOP'
+    PROG_START_CELL = 'G0_LASER_ENABLE'
+    PROG_STOP_CELL = 'G0_LASER_DISABLE'
     PROG_START_EXTRUD = 'G0_POWDER_START'
     PROG_STOP_EXTRUD = 'G0_POWDER_STOP'
+    PROG_START_TOOL = 'RUN_LASER_START'
+    PROG_STOP_TOOL = 'RUN_LASER_STOP'

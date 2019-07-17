@@ -440,8 +440,6 @@ class RobotPost(object):
             self.addline('WAIT  %.2f(sec) ;' % (time_ms*0.001))
         
     def setSpeed(self, speed_mms):
-        if hasattr(self, 'REG_SPEED'):
-            del self.REG_SPEED
         """Changes the robot speed (in mm/s)"""
         if self.SPEED_BACKUP is None:
             # Set the normal speed

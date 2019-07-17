@@ -98,6 +98,9 @@ class RobotPost(MainClass):
         self.setLBL('PASS_LBL_COUNT', 'pass%i' % (self.PASS_COUNT))
         self.setZoneData(-1)
         self.P_OFFSET = self.OFFSET_APPROACH
+        #set approach speed
+        if hasattr(self, 'REG_SPEED'):
+                del self.REG_SPEED
         self.setSpeed(self.APPRCH_SPEED)
         if hasattr(self, 'TIMEAFTER'):
             del self.TIMEAFTER
@@ -116,6 +119,9 @@ class RobotPost(MainClass):
                 del self.COORD
         if hasattr(self, 'P_OFFSET'):
             del self.P_OFFSET
+        #set travel speed
+        if hasattr(self, 'REG_SPEED'):
+                del self.REG_SPEED
         self.setSpeed(self.TRAVEL_SPEED)
 
     def moveLaserOn(self):
@@ -134,7 +140,7 @@ class RobotPost(MainClass):
                 elif hasattr(self,'P_OFFSET'):
                     del self.P_OFFSET
             elif code.startswith('TOOL_OFFSET'):
-                # Customized P_OFFSET:
+                # Customized TOOL_OFFSET:
                 value = code[len('TOOL_OFFSET'):]
                 if len(value) > 2:
                     exec('self.TOOL_OFFSET=' + value)
