@@ -121,6 +121,8 @@ class RobotPost(object):
     # Specific to ARC welding applications
     SPEED_BACKUP = None
     LAST_POSE = None
+    LAST_JOINTS = None
+    REPEAT_POSE = False
     
     def __init__(self, robotpost=None, robotname=None, robot_axes = 6, **kwargs):
         self.ROBOT_POST = robotpost
@@ -356,6 +358,7 @@ class RobotPost(object):
         move_ins = 'P[%i] %s %s ;' % (target_id, self.JOINT_SPEED, self.CNT_VALUE)
         self.addline(move_ins, 'J')
         self.LAST_POSE = pose
+        self.LAST_JOINTS = joints
         
     def MoveL(self, pose, joints, conf_RLF=None):
         """Add a linear movement"""
@@ -391,6 +394,7 @@ class RobotPost(object):
 
         self.addline('%s ;' % (move_ins), 'L')
         self.LAST_POSE = pose
+        self.LAST_JOINTS = joints
         
     def MoveC(self, pose1, joints1, pose2, joints2, conf_RLF_1=None, conf_RLF_2=None):
         """Add a circular movement"""
@@ -401,6 +405,7 @@ class RobotPost(object):
         move_ins = 'P[%i] \n       P[%i] %s %s ;' % (target_id1, target_id2, self.SPEED, self.CNT_VALUE)
         self.addline(move_ins, 'C')
         self.LAST_POSE = pose2
+        self.LAST_JOINTS = joints2
         
     def setFrame(self, pose, frame_id=None, frame_name=None):
         """Change the robot reference frame"""
@@ -704,6 +709,10 @@ class RobotPost(object):
     def add_target_joints(self, pose, joints):
         if self.nProgs > 1 and not self.INCLUDE_SUB_PROGRAMS:
             return
+
+        if self.REPEAT_POSE:
+            return self.P_COUNT
+
         self.P_COUNT = self.P_COUNT + 1
         add_comma = ""
         if self.HAS_TRACK and self.GRP_TRACK == 0:
@@ -742,6 +751,10 @@ class RobotPost(object):
     def add_target_cartesian(self, pose, joints, conf_RLF=None):
         if self.nProgs > 1 and not self.INCLUDE_SUB_PROGRAMS:
             return
+
+        if self.REPEAT_POSE:
+            return self.P_COUNT
+        
         def angle_2_turn(angle):
             if angle >= 0.0:
                 return +math.floor((+angle+180.0)/360.0)
@@ -761,9 +774,10 @@ class RobotPost(object):
                 
         turnJ1 = angle_2_turn(joints[0])
         turnJ4 = angle_2_turn(joints[3])
-        turnJ6 = angle_2_turn(joints[5])       
-            
+        turnJ6 = angle_2_turn(joints[5])
+
         self.P_COUNT = self.P_COUNT + 1
+
         add_comma = ""
         if self.HAS_TRACK and self.GRP_TRACK == 0:
             add_comma = ","
