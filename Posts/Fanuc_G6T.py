@@ -130,28 +130,34 @@ class RobotPost(MainClass):
         self.P_OFFSET = self.OFFSET_PR
         self.TIMEAFTER = (0, self.HEIGHT_SENSOR)
 
+    def laserStartSeq(self):
+        self.REPEAT_POSE = True
+        self.toolOn()
+        self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+        self.moveLaserOn()
+        self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+        self.RETRACT = True
+        self.REPEAT_POSE = False
+    
+    def laserStopSeq(self):
+        self.REPEAT_POSE = True
+        self.toolOff()
+        self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+        self.moveDepart()
+        self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+        self.moveLink()
+        self.RETRACT = False
+        self.REPEAT_POSE = False
+
     def setSpeed(self, speed_mms, check_event=True):
 
         if check_event == True:
             if speed_mms >= 50 and self.RETRACT:
-                self.REPEAT_POSE = True
-                self.toolOff()
-                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
-                self.moveDepart()
-                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
-                self.moveLink()
-                self.RETRACT = False
-                self.REPEAT_POSE = False
+                self.laserStopSeq()
             elif speed_mms > 15 and speed_mms < 18:
                 self.moveApproach()
             elif speed_mms > 33 and speed_mms < 38:
-                self.REPEAT_POSE = True
-                self.toolOn()
-                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
-                self.moveLaserOn()
-                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
-                self.RETRACT = True
-                self.REPEAT_POSE = False
+                self.laserStartSeq()
 
 
 
