@@ -148,31 +148,6 @@ class RobotPost(MainClass):
         self.moveLink()
         self.RETRACT = False
         self.REPEAT_POSE = False
-
-    def setSpeed(self, speed_mms, check_event=True):
-
-        if check_event == True:
-            if speed_mms >= 50 and self.RETRACT:
-                self.laserStopSeq()
-            elif speed_mms > 15 and speed_mms < 18:
-                self.moveApproach()
-            elif speed_mms > 33 and speed_mms < 38:
-                self.laserStartSeq()
-
-
-
-        """Changes the robot speed (in mm/s)"""
-        if self.SPEED_BACKUP is None:
-            # Set the normal speed
-            self.SPEED = '%.0fmm/sec' % max(speed_mms, 0.01)
-            # assume 5000 mm/s as 100%
-            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
-        else:
-            # Do not alter the speed as we are in ARC movement mode
-            # skip speed settings if it has been overriden
-            self.SPEED_BACKUP = '%.0fmm/sec' % max(speed_mms, 0.01)
-            # assume 5000 mm/s as 100%
-            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
     
     def RunCode(self, code, is_function_call = False):
         """Adds code or a function call"""
@@ -305,6 +280,32 @@ def _test_post():
                         [-41.62707, -8.89064, -30.01809, 60.62329, 49.66749, -258.98418])
         #linking
     robot.moveLink()
+    robot.MoveJ(_Pose([200, 200, 500, 180, 0, 180]), [-46.18419, -
+                                                      6.77518, -20.54925, 71.38674, 49.58727, -302.54752])
+    robot.MoveJ(_Pose([200, 200, 500, 180, 0, 180]), [-46.18419, -
+                                                      6.77518, -20.54925, 71.38674, 49.58727, -302.54752])
+    robot.MoveJ(_Pose([200, 200, 500, 180, 0, 180]), [-46.18419, -
+                                                      6.77518, -20.54925, 71.38674, 49.58727, -302.54752])
+
+
+    # approach
+    robot.moveApproach()
+    robot.MoveL(_Pose([200, 250, 348.734575, 180, 0, -150]),
+                       [-41.62707, -8.89064, -30.01809, 60.62329, 49.66749, -258.98418])
+    #laser start sequence
+    robot.laserStartSeq()
+    robot.MoveL(_Pose([250, 300, 278.023897, 180, 0, -150]), [-37.52588, -6.32628, -
+                                                              34.59693, 53.52525, 49.24426, -251.44677])
+    robot.MoveL(_Pose([250, 300, 278.023897, 180, 0, -150]), [-37.52588, -6.32628, -
+                                                              34.59693, 53.52525, 49.24426, -251.44677])
+    robot.MoveL(_Pose([250, 300, 278.023897, 180, 0, -150]), [-37.52588, -6.32628, -
+                                                              34.59693, 53.52525, 49.24426, -251.44677])
+    robot.MoveL(_Pose([250, 300, 278.023897, 180, 0, -150]), [-37.52588, -6.32628, -
+                                                              34.59693, 53.52525, 49.24426, -251.44677])
+    #laser stop sequence
+    robot.laserStopSeq()
+
+    #link
     robot.MoveJ(_Pose([200, 200, 500, 180, 0, 180]), [-46.18419, -
                                                       6.77518, -20.54925, 71.38674, 49.58727, -302.54752])
     robot.MoveJ(_Pose([200, 200, 500, 180, 0, 180]), [-46.18419, -

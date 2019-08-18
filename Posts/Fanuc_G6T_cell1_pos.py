@@ -55,3 +55,28 @@ class RobotPost(G6TClass):
     PROG_STOP_EXTRUD = 'G0_POWDER_STOP'
     PROG_START_TOOL = 'RUN_LASER_START'
     PROG_STOP_TOOL = 'RUN_LASER_STOP'
+
+    def setSpeed(self, speed_mms, check_event=True):
+
+        #user certain speed changes to inject program events
+        if check_event == True:
+            if speed_mms >= 50 and self.RETRACT:
+                self.laserStopSeq()
+            elif speed_mms > 15 and speed_mms < 18:
+                self.moveApproach()
+            elif speed_mms > 33 and speed_mms < 38:
+                self.laserStartSeq()
+
+        """Changes the robot speed (in mm/s)"""
+        if self.SPEED_BACKUP is None:
+            # Set the normal speed
+            self.SPEED = '%.0fmm/sec' % max(speed_mms, 0.01)
+            # assume 5000 mm/s as 100%
+            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
+        else:
+            # Do not alter the speed as we are in ARC movement mode
+            # skip speed settings if it has been overriden
+            self.SPEED_BACKUP = '%.0fmm/sec' % max(speed_mms, 0.01)
+            # assume 5000 mm/s as 100%
+            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
+

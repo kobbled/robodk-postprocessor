@@ -444,7 +444,13 @@ class RobotPost(object):
         else:
             self.addline('WAIT  %.2f(sec) ;' % (time_ms*0.001))
         
-    def setSpeed(self, speed_mms):
+    def setSpeed(self, speed_mms, check_event=True):
+
+        #user certain speed changes to inject program events
+        ##if check_event == True:
+        ##    if speed_mms >= 50 and self.RETRACT:
+        ##        self.laserStopSeq()
+
         """Changes the robot speed (in mm/s)"""
         if self.SPEED_BACKUP is None:
             # Set the normal speed
