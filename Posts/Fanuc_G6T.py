@@ -49,6 +49,7 @@ class RobotPost(MainClass):
     PASS_LBL_COUNT = 100
 
     TOOLON = False
+    RETRACT = False
     PROG_START_CELL = 'G0_LASER_ENABLE'
     PROG_STOP_CELL = 'G0_LASER_DISABLE'
     PROG_START_EXTRUD = 'G0_POWDER_START'
@@ -96,12 +97,13 @@ class RobotPost(MainClass):
 
     def moveApproach(self):
         self.setLBL('PASS_LBL_COUNT', 'pass%i' % (self.PASS_COUNT))
+        self.PASS_COUNT += 1
         self.setZoneData(-1)
         self.P_OFFSET = self.OFFSET_APPROACH
         #set approach speed
         if hasattr(self, 'REG_SPEED'):
                 del self.REG_SPEED
-        self.setSpeed(self.APPRCH_SPEED)
+        self.setSpeed(self.APPRCH_SPEED, False)
         if hasattr(self, 'TIMEAFTER'):
             del self.TIMEAFTER
 
@@ -122,11 +124,49 @@ class RobotPost(MainClass):
         #set travel speed
         if hasattr(self, 'REG_SPEED'):
                 del self.REG_SPEED
-        self.setSpeed(self.TRAVEL_SPEED)
+        self.setSpeed(self.TRAVEL_SPEED, False)
 
     def moveLaserOn(self):
         self.P_OFFSET = self.OFFSET_PR
         self.TIMEAFTER = (0, self.HEIGHT_SENSOR)
+
+    def setSpeed(self, speed_mms, check_event=True):
+
+        if check_event == True:
+            if speed_mms >= 50 and self.RETRACT:
+                self.REPEAT_POSE = True
+                self.toolOff()
+                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+                self.moveDepart()
+                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+                self.moveLink()
+                self.RETRACT = False
+                self.REPEAT_POSE = False
+            elif speed_mms > 15 and speed_mms < 18:
+                self.moveApproach()
+            elif speed_mms > 33 and speed_mms < 38:
+                self.REPEAT_POSE = True
+                self.toolOn()
+                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+                self.moveLaserOn()
+                self.MoveL(self.LAST_POSE, self.LAST_JOINTS)
+                self.RETRACT = True
+                self.REPEAT_POSE = False
+
+
+
+        """Changes the robot speed (in mm/s)"""
+        if self.SPEED_BACKUP is None:
+            # Set the normal speed
+            self.SPEED = '%.0fmm/sec' % max(speed_mms, 0.01)
+            # assume 5000 mm/s as 100%
+            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
+        else:
+            # Do not alter the speed as we are in ARC movement mode
+            # skip speed settings if it has been overriden
+            self.SPEED_BACKUP = '%.0fmm/sec' % max(speed_mms, 0.01)
+            # assume 5000 mm/s as 100%
+            #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
     
     def RunCode(self, code, is_function_call = False):
         """Adds code or a function call"""
