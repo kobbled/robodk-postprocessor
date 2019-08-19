@@ -59,6 +59,7 @@ class RobotPost(MainClass):
         
     def startExtrud(self):
         self.RunCode(self.PROG_START_EXTRUD, True)
+        self.waitMS(15000)
     
     def stopExtrud(self):
         self.RunCode(self.PROG_STOP_EXTRUD, True)
