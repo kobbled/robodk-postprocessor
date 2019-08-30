@@ -33,7 +33,7 @@ class RobotPost(G6TClass):
     ACTIVE_UF = 5           # Active UFrame Id (register)
     ACTIVE_UT = 5           # Active UTool Id (register)
     HAS_TURNTABLE = True
-    GRP_TURNTABLE = 2
+    GRP_TURNTABLE = 4
     HAS_TRACK = True
     GRP_TRACK = 3
 
@@ -62,9 +62,9 @@ class RobotPost(G6TClass):
         if check_event == True:
             if speed_mms >= 50 and self.RETRACT:
                 self.laserStopSeq()
-            elif speed_mms > 15 and speed_mms < 18:
+            elif speed_mms > 0.6 and speed_mms < 0.8:
                 self.moveApproach()
-            elif speed_mms > 33 and speed_mms < 38:
+            elif speed_mms > 1.3 and speed_mms < 1.5:
                 self.laserStartSeq()
 
         """Changes the robot speed (in mm/s)"""
