@@ -13,7 +13,7 @@ from Fanuc_G6T import RobotPost as G6TClass
 class RobotPost(G6TClass):
     # speeds
     JOINT_SPEED = '20%'     # set joint speed motion (first pose)
-    SPEED = '75mm/sec'     # set cartesian speed motion (approach pose)
+    SPEED = '50mm/sec'     # set cartesian speed motion (approach pose)
     SPEED_REGISTER = 157
     TRAVEL_SPEED = 75
     APPRCH_SPEED = 25
@@ -30,7 +30,8 @@ class RobotPost(G6TClass):
     USE_COORD_MOTION = False  # flag coordinated motion
 
     # cell configuration
-    ACTIVE_UF = 5           # Active UFrame Id (register)
+    #static frame ACTIVE_UF = 3           # Active UFrame Id (register)
+    ACTIVE_UF = 5 #rot frame
     ACTIVE_UT = 5           # Active UTool Id (register)
     HAS_TURNTABLE = True
     GRP_TURNTABLE = 4

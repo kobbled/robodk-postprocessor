@@ -59,21 +59,20 @@ class RobotPost(MainClass):
         
     def startExtrud(self):
         self.RunCode(self.PROG_START_EXTRUD, True)
-        self.waitMS(15000)
     
     def stopExtrud(self):
         self.RunCode(self.PROG_STOP_EXTRUD, True)
 
     def startPassLoop(self):
-        self.RunCode(self.PROG_START_CELL, True)
+        #self.RunCode(self.PROG_START_EXTRUD, True)
+        #self.RunCode(self.PROG_START_CELL, True)
         self.resetTimer(self.LASER_TIMER)
-        self.RunCode(self.PROG_START_EXTRUD, True)
         self.RunCode('R[215:passLbl] = 100 + R[180:j]')
         self.ifOnJump('R[180:j]>=0', numReg=215)
 
     def stopPassLoop(self):
-        self.RunCode(self.PROG_STOP_EXTRUD, True)
-        self.RunCode(self.PROG_STOP_CELL, True)
+        #self.RunCode(self.PROG_STOP_EXTRUD, True)
+        return 0
 
     def toolOn(self):
         self.waitMS(200)
@@ -215,6 +214,10 @@ class RobotPost(MainClass):
                 exec('self.startPassLoop()')
             elif code.startswith('stopPassLoop'):
                 exec('self.stopPassLoop()')
+            elif code.startswith('laserStartSeq'):
+                exec('self.laserStartSeq()')
+            elif code.startswith('laserStopSeq'):
+                exec('self.laserStopSeq()')
             else:
                 self.addline('CALL %s ;' % (code))
         else:
