@@ -30,10 +30,10 @@ class RobotPost(G6TClass):
     USE_COORD_MOTION = False  # flag coordinated motion
 
     # cell configuration
-    ACTIVE_UF = 2           # Active UFrame Id (register)
+    ACTIVE_UF = 9           # Active UFrame Id (register)
     ACTIVE_UT = 3           # Active UTool Id (register)
-    HAS_TURNTABLE = True
-    GRP_TURNTABLE = 2
+    HAS_TURNTABLE = False
+    GRP_TURNTABLE = 0
     HAS_TRACK = False
     GRP_TRACK = 0
 
@@ -42,7 +42,7 @@ class RobotPost(G6TClass):
     POWDER_TIMER = 3
 
     # sensors
-    # HEIGHT_SENSOR = 50
+    ##HEIGHT_SENSOR = 50
 
     # other variables
     PASS_COUNT = 0
