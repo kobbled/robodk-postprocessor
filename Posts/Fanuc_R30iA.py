@@ -70,7 +70,7 @@ import sys
 class RobotPost(object):
     """Robot post object defined for Fanuc robots"""
     PROG_EXT = 'LS'             # set the program extension
-    MAX_LINES_X_PROG = 9999    # maximum number of lines per program. It will then generate multiple "pages (files)". This can be overriden by RoboDK settings.
+    MAX_LINES_X_PROG = 2999    # maximum number of lines per program. It will then generate multiple "pages (files)". This can be overriden by RoboDK settings.
     INCLUDE_SUB_PROGRAMS = True # Generate sub programs
     JOINT_SPEED = '20%'     # set default joint speed motion
     SPEED = '500mm/sec'     # set default cartesian speed motion  

@@ -59,7 +59,9 @@ class RobotPost(G6TClass):
     def startPassLoop(self):
         self.RunCode(self.PROG_START_CELL, True)
         self.resetTimer(self.LASER_TIMER)
-        self.RunCode(self.PROG_START_EXTRUD, True)
+
+    def stopPassLoop(self):
+        self.RunCode(self.PROG_STOP_CELL, True)
     
     def moveApproach(self):
         self.setZoneData(-1)
@@ -76,15 +78,18 @@ class RobotPost(G6TClass):
         if hasattr(self, 'TIMEAFTER'):
             del self.TIMEAFTER
 
+
+    # *** Use Slic3r configuration in cell2-AM folder. ****
+    # 66 mm/s feed speed, 50 mm/s move speed.
     def setSpeed(self, speed_mms, check_event=True):
 
         #user certain speed changes to inject program events
         if check_event == True:
-            if speed_mms >= 130 and self.RETRACT:
+            if speed_mms == 50 and self.RETRACT:
                 self.laserStopSeq()
-            elif speed_mms > 38 and speed_mms < 43:
+            elif speed_mms == 40 and not self.RETRACT:
                 self.moveApproach()
-            elif speed_mms > 28 and speed_mms < 33:
+            elif speed_mms == 66 and not self.RETRACT:
                 self.laserStartSeq()
 
         """Changes the robot speed (in mm/s)"""
