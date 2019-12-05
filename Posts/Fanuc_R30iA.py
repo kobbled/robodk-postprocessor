@@ -454,13 +454,13 @@ class RobotPost(object):
         """Changes the robot speed (in mm/s)"""
         if self.SPEED_BACKUP is None:
             # Set the normal speed
-            self.SPEED = '%.0fmm/sec' % max(speed_mms, 0.01)
+            self.SPEED = '%.1fmm/sec' % max(speed_mms, 0.01)
             # assume 5000 mm/s as 100%
             #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
         else:
             # Do not alter the speed as we are in ARC movement mode
             # skip speed settings if it has been overriden
-            self.SPEED_BACKUP = '%.0fmm/sec' % max(speed_mms, 0.01)
+            self.SPEED_BACKUP = '%.1fmm/sec' % max(speed_mms, 0.01)
             # assume 5000 mm/s as 100%
             #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
     
@@ -940,10 +940,13 @@ def test_post():
     robot.RunMessage("Setting air valve off")
     robot.RunCode("TCP_Off", True)
     robot.Pause(1000)
+    robot.setSpeed(30)
     robot.MoveL(Pose([250, 300, 278.023897, 180, 0, -150]),
                 [-37.52588, -6.32628, -34.59693, 53.52525, 49.24426, -251.44677])
+    robot.setSpeed(20)
     robot.MoveL(Pose([250, 200, 278.023897, 180, 0, -150]),
                 [-41.85389, -1.95619, -34.89154, 57.43912, 52.34162, -253.73403])
+    robot.setSpeed(10)
     robot.MoveL(Pose([250, 150, 191.421356, 180, 0, -150]),
                 [-43.82111, 3.29703, -40.29493, 56.02402, 56.61169, -249.23532])
 
