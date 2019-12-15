@@ -81,6 +81,7 @@ class RobotPost(object):
     SPARE_PR = 9            # Spare Position register for calculations
     UTOOL_PR = 9
     UFRAME_PR = 9
+    JOINT_CONFIG = ['N','U','T']
 
     # PROG specific variables:
     LINE_COUNT = 0 # Count the number of instructions (limited by MAX_LINES_X_PROG)
@@ -768,7 +769,7 @@ class RobotPost(object):
                 return -math.floor((-angle+180.0)/360.0)
         #return add_target_joints(pose, joints) # using joints as targets is safer to avoid problems setting up the reference frame and configurations
         xyzwpr = Pose_2_Fanuc(pose)
-        config = ['N','U','T'] #normal        
+        config = self.JOINT_CONFIG #normal        
         #config= ['F','D','B'] #alternative
         if conf_RLF is not None:
             if conf_RLF[2] > 0:
