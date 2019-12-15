@@ -454,13 +454,13 @@ class RobotPost(object):
         """Changes the robot speed (in mm/s)"""
         if self.SPEED_BACKUP is None:
             # Set the normal speed
-            self.SPEED = '%.1fmm/sec' % max(speed_mms, 0.01)
+            self.SPEED = '%.0fmm/sec' % max(speed_mms, 0.01)
             # assume 5000 mm/s as 100%
             #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
         else:
             # Do not alter the speed as we are in ARC movement mode
             # skip speed settings if it has been overriden
-            self.SPEED_BACKUP = '%.1fmm/sec' % max(speed_mms, 0.01)
+            self.SPEED_BACKUP = '%.0fmm/sec' % max(speed_mms, 0.01)
             # assume 5000 mm/s as 100%
             #self.JOINT_SPEED = '%.0f%%' % max(min(100.0*speed_mms/5000.0, 100.0), 1) # Saturate percentage speed between 1 and 100
     
