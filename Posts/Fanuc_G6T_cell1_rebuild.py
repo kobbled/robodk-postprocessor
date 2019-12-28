@@ -27,7 +27,7 @@ class RobotPost(G6TClass):
     OFFSET_STOP = 26
     OFFSET_APPROACH = 58
     OFFSET_DEPART = 59
-    USE_COORD_MOTION = False  # flag coordinated motion
+    USE_COORD_MOTION = True  # flag coordinated motion
 
     # cell configuration
     #static frame ACTIVE_UF = 3           # Active UFrame Id (register)
