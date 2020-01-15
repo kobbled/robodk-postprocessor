@@ -67,8 +67,8 @@ class RobotPost(MainClass):
         #self.RunCode(self.PROG_START_EXTRUD, True)
         #self.RunCode(self.PROG_START_CELL, True)
         self.resetTimer(self.LASER_TIMER)
-        self.RunCode('R[215:passLbl] = 100 + R[180:j]')
-        self.ifOnJump('R[180:j]>=0', numReg=284)
+        self.RunCode('R[215:passLbl] = 100 + R[284:j]')
+        self.ifOnJump('R[284:j]>=0', numReg=215)
 
     def stopPassLoop(self):
         #self.RunCode(self.PROG_STOP_EXTRUD, True)
