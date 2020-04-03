@@ -11,9 +11,10 @@ from Fanuc_G6T import RobotPost as G6TClass
 
 
 class RobotPost(G6TClass):
+    MAX_LINES_X_PROG = 1500    # maximum number of lines per program. It will then generate multiple "pages (files)". This can be overriden by RoboDK settings.
     # speeds
     JOINT_SPEED = '20%'     # set joint speed motion (first pose)
-    SPEED = '50mm/sec'     # set cartesian speed motion (approach pose)
+    SPEED = '150mm/sec'     # set cartesian speed motion (approach pose)
     SPEED_REGISTER = 157
     TRAVEL_SPEED = 75
     APPRCH_SPEED = 25
@@ -37,6 +38,7 @@ class RobotPost(G6TClass):
     GRP_TURNTABLE = 4
     HAS_TRACK = True
     GRP_TRACK = 3
+    JOINT_CONFIG = ['F','U','T']
 
     # timers
     LASER_TIMER = 3
@@ -97,7 +99,7 @@ class RobotPost(G6TClass):
         self.REPEAT_POSE = False
 
 
-    def RunCode(self, code, is_function_call = False):
+    def RunCode(self, code, is_function_call = False, checkProgSize=True):
         """Adds code or a function call"""
         if is_function_call:
             code.replace(' ', '_')
@@ -167,9 +169,9 @@ class RobotPost(G6TClass):
             elif code.startswith('laserStopSeq'):
                 exec('self.laserStopSeq('+ code.split("(")[1])
             else:
-                self.addline('CALL %s ;' % (code))
+                self.addline('CALL %s ;' % (code), checkProgSize=checkProgSize)
         else:
             if not code.endswith(';'):
                 code = code + ';'
-            self.addline(code)
+            self.addline(code, checkProgSize=checkProgSize)
 

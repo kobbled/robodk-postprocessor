@@ -3,3 +3,5 @@ __pycache__/
 Original-posts/
 .vscode/
 package.json
+*.code-workspace
+*py.bak

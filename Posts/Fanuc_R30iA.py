@@ -109,7 +109,7 @@ class RobotPost(object):
     LOG = '' # Save a log
     
     nAxes = 6 # Important: This is usually provided by RoboDK automatically. Otherwise, override the __init__ procedure. 
-    AXES_TYPE = ['R','R','R','R','R','R']  # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
+    AXES_TYPE = ['R','R','R','R','R','R','T','J','J']  # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
     # 'R' for rotative axis, 'L' for linear axis, 'T' for external linear axis (linear track), 'J' for external rotative axis (turntable)
     #AXES_TYPE = ['R','R','R','R','R','R','T','J','J'] #example of a robot with one external linear track axis and a turntable with 2 rotary axes
     AXES_TRACK = []
@@ -124,6 +124,9 @@ class RobotPost(object):
     LAST_POSE = None
     LAST_JOINTS = None
     REPEAT_POSE = False
+
+    #labels
+    END_LBL = 8999
     
     def __init__(self, robotpost=None, robotname=None, robot_axes = 6, **kwargs):
         self.ROBOT_POST = robotpost
@@ -496,7 +499,7 @@ class RobotPost(object):
 
         return value
 
-    def setLBL(self, counterName='LBL_ID_COUNT', labelName=None):
+    def setLBL(self, counterName='LBL_ID_COUNT', labelName=None, checkProgSize=True):
         # get counter
         counter = getattr(self, counterName)
         if counter < 1:
@@ -517,7 +520,7 @@ class RobotPost(object):
             label = '%s:%s' % (label, labelName)
         label = '%s] ;' % (label)
 
-        self.addline(label)  # add to post
+        self.addline(label, checkProgSize=checkProgSize)  # add to post
 
         # set counter
         counter += 1
@@ -533,15 +536,26 @@ class RobotPost(object):
 
         return jmpLbl
 
-    def jump2LBL(self, labelNumber=None, numReg=None):
+    def jump2LBL(self, labelNumber=None, numReg=None, checkProgSize=True):
         lbl = self.jumpLBL(labelNumber, numReg)
         if lbl is not None:
-            self.addline('%s ;' % (lbl))
+            self.addline('%s ;' % (lbl), checkProgSize=checkProgSize)
 
-    def ifOnJump(self, conditional, labelNumber=None, numReg=None):
+    def ifOnJump(self, conditional, labelNumber=None, numReg=None, checkProgSize=True):
         lbl = self.jumpLBL(labelNumber, numReg)
         if lbl is not None:
             self.addline('IF %s,%s ;' % (conditional, lbl))
+        
+    
+    # member placeholders to handle if anything should be appended
+    # to the top and bottom of a multiprogram file. 
+    def startPassLoop(self):
+        return 0
+
+    def stopPassLoop(self):
+        self.setLBL('END_LBL', 'EOF', checkProgSize=False)
+        return 0
+    # ****
 
     def setDO(self, io_var, io_value):
         """Sets a variable (output) to a given value"""
@@ -587,15 +601,15 @@ class RobotPost(object):
     def stopTimer(self, timer_var):
         self.addline('TIMER[%i]=STOP ;' % (timer_var))
 
-    def resetTimer(self, timer_var):
-        self.addline('TIMER[%i]=RESET ;' % (timer_var))
+    def resetTimer(self, timer_var, checkProgSize=True):
+        self.addline('TIMER[%i]=RESET ;' % (timer_var), checkProgSize=checkProgSize)
 
     def addlastline(self, add_params):
         """Add parameters to the last command"""
         if len(self.PROG) > 0 and self.PROG[-1].endswith(';\n'):
             self.PROG[-1] = self.PROG[-1][:-2] + add_params + ';' # remove last 2 characters
             
-    def RunCode(self, code, is_function_call = False):
+    def RunCode(self, code, is_function_call = False, checkProgSize=True):
         """Adds code or a function call"""
         if is_function_call:
             code.replace(' ', '_')
@@ -638,11 +652,11 @@ class RobotPost(object):
                 if len(value) > 2:
                     exec('self.resetTimer' + value)
             else:
-                self.addline('CALL %s ;' % (code))
+                self.addline('CALL %s ;' % (code), checkProgSize=checkProgSize)
         else:
             if not code.endswith(';'):
                 code = code + ';'
-            self.addline(code)
+            self.addline(code, checkProgSize=checkProgSize)
         
     def RunMessage(self, message, iscomment = False):
         """Add a joint movement"""
@@ -688,15 +702,18 @@ class RobotPost(object):
     def page_size_control(self):
         if self.LINE_COUNT >= self.MAX_LINES_X_PROG:
             #self.nLines = 0
+            self.stopPassLoop()
             self.ProgFinish(self.PROG_NAME, True)
             self.ProgStart(self.PROG_NAME, True)
+            self.startPassLoop()
 
-    def addline(self, newline, movetype = ' '):
+    def addline(self, newline, movetype = ' ', checkProgSize = True):
         """Add a program line"""
         if self.nProgs > 1 and not self.INCLUDE_SUB_PROGRAMS:
             return
         
-        self.page_size_control()
+        if checkProgSize:
+            self.page_size_control()
         
         self.LINE_COUNT = self.LINE_COUNT + 1
         newline_ok = ('%4i:%s ' % (self.LINE_COUNT, movetype)) + newline            
@@ -896,7 +913,7 @@ def test_post():
     robot.setFrame(Pose([807.766544, -963.699898, 41.478944, 0, 0, 0]))
     robot.setTool(Pose([62.5, -108.253175, 100, -60, 90, 0]))
     robot.MoveJ(Pose([200, 200, 500, 180, 0, 180]), [-46.18419, -
-                                                     6.77518, -20.54925, 71.38674, 49.58727, -302.54752])
+                                                     6.77518, -20.54925, 71.38674, 49.58727, -302.54752, 100, 0, 0])
     robot.MoveL(Pose([200, 250, 348.734575, 180, 0, -150]),
                 [-41.62707, -8.89064, -30.01809, 60.62329, 49.66749, -258.98418])
     robot.MoveL(Pose([200, 200, 262.132034, 180, 0, -150]),

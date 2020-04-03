@@ -47,6 +47,7 @@ class RobotPost(MainClass):
     # other variables
     PASS_COUNT = 0
     PASS_LBL_COUNT = 100
+    END_LBL = 8999
 
     TOOLON = False
     RETRACT = False
@@ -66,13 +67,14 @@ class RobotPost(MainClass):
     def startPassLoop(self):
         #self.RunCode(self.PROG_START_EXTRUD, True)
         #self.RunCode(self.PROG_START_CELL, True)
-        self.resetTimer(self.LASER_TIMER)
-        self.RunCode('R[215:passLbl] = 100 + R[284:j]')
-        self.ifOnJump('R[284:j]>=0', numReg=215)
+        self.resetTimer(self.LASER_TIMER, checkProgSize=False)
+        self.RunCode('R[%i:passLbl] = 100 + R[%i:j]' % (215, 284), checkProgSize=False)
+        self.ifOnJump('R[%i:j]>%i' % (284, 9999), labelNumber=self.END_LBL, checkProgSize=False)
+        self.ifOnJump('R[%i:j]>=%i' % (284, self.PASS_COUNT), numReg=215, checkProgSize=False)
 
     def stopPassLoop(self):
         #self.RunCode(self.PROG_STOP_EXTRUD, True)
-        return 0
+        self.setLBL('END_LBL', 'EOF', checkProgSize=False)
 
     def toolOn(self):
         self.waitMS(200)
@@ -149,7 +151,7 @@ class RobotPost(MainClass):
         self.RETRACT = False
         self.REPEAT_POSE = False
     
-    def RunCode(self, code, is_function_call = False):
+    def RunCode(self, code, is_function_call = False, checkProgSize=True):
         """Adds code or a function call"""
         if is_function_call:
             code.replace(' ', '_')
@@ -219,11 +221,11 @@ class RobotPost(MainClass):
             elif code.startswith('laserStopSeq'):
                 exec('self.laserStopSeq()')
             else:
-                self.addline('CALL %s ;' % (code))
+                self.addline('CALL %s ;' % (code), checkProgSize=checkProgSize)
         else:
             if not code.endswith(';'):
                 code = code + ';'
-            self.addline(code)
+            self.addline(code, checkProgSize=checkProgSize)
 
 
 # -------------------------------------------------
