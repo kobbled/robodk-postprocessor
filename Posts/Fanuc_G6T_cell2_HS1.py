@@ -27,7 +27,7 @@ class RobotPost(G6TClass):
     OFFSET_STOP = 26
     OFFSET_APPROACH = 78
     OFFSET_DEPART = 76
-    USE_COORD_MOTION = False  # flag coordinated motion
+    USE_COORD_MOTION = True  # flag coordinated motion
 
     # cell configuration
     ACTIVE_UF = 2           # Active UFrame Id (register)
@@ -36,13 +36,14 @@ class RobotPost(G6TClass):
     GRP_TURNTABLE = 2
     HAS_TRACK = False
     GRP_TRACK = 0
+    JOINT_CONFIG = ['F','U','T']
 
     # timers
     LASER_TIMER = 1
     POWDER_TIMER = 3
 
     # sensors
-    # HEIGHT_SENSOR = 50
+    HEIGHT_SENSOR = 50
 
     # other variables
     PASS_COUNT = 0
@@ -62,9 +63,9 @@ class RobotPost(G6TClass):
         if check_event == True:
             if speed_mms >= 50 and self.RETRACT:
                 self.laserStopSeq()
-            elif speed_mms > 15 and speed_mms < 18:
+            elif speed_mms > 0.6 and speed_mms < 0.8:
                 self.moveApproach()
-            elif speed_mms > 33 and speed_mms < 38:
+            elif speed_mms > 1.3 and speed_mms < 1.5:
                 self.laserStartSeq()
 
         """Changes the robot speed (in mm/s)"""
