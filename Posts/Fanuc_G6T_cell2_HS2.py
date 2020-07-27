@@ -63,9 +63,9 @@ class RobotPost(G6TClass):
         if check_event == True:
             if speed_mms >= 50 and self.RETRACT:
                 self.laserStopSeq()
-            elif speed_mms > 0.6 and speed_mms < 0.8:
+            elif speed_mms > 15 and speed_mms < 18:
                 self.moveApproach()
-            elif speed_mms > 1.3 and speed_mms < 1.5:
+            elif speed_mms > 33 and speed_mms < 38:
                 self.laserStartSeq()
 
         """Changes the robot speed (in mm/s)"""
