@@ -68,6 +68,8 @@ class RobotPost(MainClass):
         #self.RunCode(self.PROG_START_EXTRUD, True)
         #self.RunCode(self.PROG_START_CELL, True)
         self.resetTimer(self.LASER_TIMER, checkProgSize=False)
+        self.setFrame(self.LAST_POSE)
+        self.setTool(self.LAST_POSE)
         self.RunCode('R[%i:passLbl] = 100 + R[%i:j]' % (215, 284), checkProgSize=False)
         self.ifOnJump('R[%i:j]>%i' % (284, 9999), labelNumber=self.END_LBL, checkProgSize=False)
         self.ifOnJump('R[%i:j]>=%i' % (284, self.PASS_COUNT), numReg=215, checkProgSize=False)
