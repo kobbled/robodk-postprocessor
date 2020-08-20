@@ -109,7 +109,7 @@ class RobotPost(object):
     LOG = '' # Save a log
     
     nAxes = 6 # Important: This is usually provided by RoboDK automatically. Otherwise, override the __init__ procedure. 
-    AXES_TYPE = ['R','R','R','R','R','R','T','J','J']  # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
+    AXES_TYPE = ['R','R','R','R','R','R']  # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
     # 'R' for rotative axis, 'L' for linear axis, 'T' for external linear axis (linear track), 'J' for external rotative axis (turntable)
     #AXES_TYPE = ['R','R','R','R','R','R','T','J','J'] #example of a robot with one external linear track axis and a turntable with 2 rotary axes
     AXES_TRACK = []

@@ -32,6 +32,8 @@ class RobotPost(G6TClass):
 
     # cell configuration
     #static frame ACTIVE_UF = 3           # Active UFrame Id (register)
+    nAxes = 6 # Important: This is usually provided by RoboDK automatically. Otherwise, override the __init__ procedure. 
+    AXES_TYPE = ['R','R','R','R','R','R','T','J'] # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
     ACTIVE_UF = 5 #rot frame
     ACTIVE_UT = 5           # Active UTool Id (register)
     HAS_TURNTABLE = True

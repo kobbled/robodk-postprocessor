@@ -30,6 +30,8 @@ class RobotPost(G6TClass):
     USE_COORD_MOTION = True  # flag coordinated motion
 
     # cell configuration
+    nAxes = 6 # Important: This is usually provided by RoboDK automatically. Otherwise, override the __init__ procedure. 
+    AXES_TYPE = ['R','R','R','R','R','R','T','J'] # Important: This is usually set up by RoboDK automatically. Otherwise, override the __init__ procedure.
     ACTIVE_UF = 2           # Active UFrame Id (register)
     ACTIVE_UT = 3           # Active UTool Id (register)
     HAS_TURNTABLE = True
