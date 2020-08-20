@@ -59,10 +59,10 @@ class RobotPost(MainClass):
     PROG_STOP_TOOL = 'RUN_LASER_STOP'
         
     def startExtrud(self):
-        self.RunCode(self.PROG_START_EXTRUD, True)
+        self.RunCode(self.PROG_START_EXTRUD, is_function_call=True, checkProgSize=False)
     
     def stopExtrud(self):
-        self.RunCode(self.PROG_STOP_EXTRUD, True)
+        self.RunCode(self.PROG_STOP_EXTRUD, is_function_call=True, checkProgSize=False)
 
     def startPassLoop(self):
         #self.RunCode(self.PROG_START_EXTRUD, True)

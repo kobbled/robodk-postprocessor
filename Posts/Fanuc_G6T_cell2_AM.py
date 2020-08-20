@@ -56,23 +56,6 @@ class RobotPost(G6TClass):
     PROG_START_TOOL = 'RUN_LASER_START'
     PROG_STOP_TOOL = 'RUN_LASER_STOP'
 
-    def startPassLoop(self):
-        self.RunCode(self.PROG_START_CELL, True)
-        self.resetTimer(self.LASER_TIMER)
-
-    def stopPassLoop(self):
-        self.RunCode(self.PROG_STOP_CELL, True)
-    
-    def moveApproach(self):
-        self.setZoneData(-1)
-        self.P_OFFSET = self.OFFSET_APPROACH
-        #set approach speed
-        if hasattr(self, 'REG_SPEED'):
-                del self.REG_SPEED
-        self.setSpeed(self.APPRCH_SPEED, False)
-        if hasattr(self, 'TIMEAFTER'):
-            del self.TIMEAFTER
-
     def moveLaserOn(self):
         self.P_OFFSET = self.OFFSET_PR
         if hasattr(self, 'TIMEAFTER'):
@@ -85,11 +68,10 @@ class RobotPost(G6TClass):
 
         #user certain speed changes to inject program events
         if check_event == True:
-            if speed_mms == 50 and self.RETRACT:
+            if speed_mms >= 130 and speed_mms < 140 and self.RETRACT:
                 self.laserStopSeq()
-            elif speed_mms == 40 and not self.RETRACT:
+            elif speed_mms >= 30 and speed_mms < 40 and not self.RETRACT:
                 self.moveApproach()
-            elif speed_mms == 66 and not self.RETRACT:
                 self.laserStartSeq()
 
         """Changes the robot speed (in mm/s)"""
