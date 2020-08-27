@@ -47,6 +47,8 @@ class RobotPost(G6TClass):
     HEIGHT_SENSOR = 50
 
     # other variables
+    PASS_LBL_REGISTER = 215
+    J_LBL_REGISTER = 284
     PASS_COUNT = 0
     PASS_LBL_COUNT = 100
 

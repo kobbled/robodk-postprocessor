@@ -11,6 +11,8 @@ from Fanuc_R30iA import RobotPost as MainClass
 
 
 class RobotPost(MainClass):
+    #lines per prog
+    MAX_LINES_X_PROG = 2000
     # speeds
     JOINT_SPEED = '20%'     # set joint speed motion (first pose)
     SPEED = '75mm/sec'     # set cartesian speed motion (approach pose)
@@ -46,6 +48,8 @@ class RobotPost(MainClass):
     HEIGHT_SENSOR = 50
 
     # other variables
+    PASS_LBL_REGISTER = 215
+    J_LBL_REGISTER = 284
     PASS_COUNT = 0
     PASS_LBL_COUNT = 100
     END_LBL = 8999
@@ -71,9 +75,9 @@ class RobotPost(MainClass):
         self.resetTimer(self.LASER_TIMER, checkProgSize=False)
         self.setFrame(_Pose([0, 0, 0, 0, 0, 0]))
         self.setTool(_Pose([0, 0, 0, 0, 0, 0]))
-        self.RunCode('R[%i:passLbl] = 100 + R[%i:j]' % (215, 284), checkProgSize=False)
-        self.ifOnJump('R[%i:j]>%i' % (284, 9999), labelNumber=self.END_LBL, checkProgSize=False)
-        self.ifOnJump('R[%i:j]>=%i' % (284, self.PASS_COUNT), numReg=215, checkProgSize=False)
+        self.RunCode('R[%i:passLbl] = 100 + R[%i:j]' % (self.PASS_LBL_REGISTER, self.J_LBL_REGISTER), checkProgSize=False)
+        self.ifOnJump('R[%i:j]>%i' % (self.J_LBL_REGISTER, 9999), labelNumber=self.END_LBL, checkProgSize=False)
+        self.ifOnJump('R[%i:j]>=%i' % (self.J_LBL_REGISTER, self.PASS_COUNT), numReg=self.PASS_LBL_REGISTER, checkProgSize=False)
 
     def stopPassLoop(self):
         #self.RunCode(self.PROG_STOP_EXTRUD, True)
