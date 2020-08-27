@@ -38,7 +38,7 @@ class RobotPost(G6TClass):
     HAS_TURNTABLE = True
     GRP_TURNTABLE = 3
     HAS_TRACK = False
-    GRP_TRACK = 0
+    GRP_TRACK = -1
     JOINT_CONFIG = ['F','U','T']
 
     # timers

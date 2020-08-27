@@ -754,7 +754,7 @@ class RobotPost(object):
                 self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
                 for i in range(len(self.AXES_TRACK)):
                     track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TRACK[i]])
-            else:
+            elif self.GRP_TRACK == 0:
                 for i in range(len(self.AXES_TRACK)):
                     track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
             track_str = track_str[:-1]
@@ -818,7 +818,7 @@ class RobotPost(object):
                 self.addline_targets('    UF : %i, UT : %i,' % (self.ACTIVE_UF, self.ACTIVE_UT))
                 for i in range(len(self.AXES_TRACK)):
                     track_str = track_str + '\tJ%i=%10.3f mm,' % (i+1, joints[self.AXES_TRACK[i]])
-            else:
+            elif self.GRP_TRACK == 0:
                 for i in range(len(self.AXES_TRACK)):
                     track_str = track_str + '\tE%i=%10.3f  mm,' % (i+1, joints[self.AXES_TRACK[i]])
             track_str = track_str[:-1]
